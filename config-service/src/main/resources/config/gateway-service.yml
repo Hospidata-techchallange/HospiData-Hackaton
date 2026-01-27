@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: AUTH-SERVICE
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/v1/auth,/api/v1/auth/**
+            - id: STOCK-SERVICE
+              uri: lb://STOCK-SERVICE
+              predicates:
+                - Path=/api/v1/stocks,/api/v1/stocks/**
+            - id: WORK-ORDER-SERVICE
+              uri: lb://WORK-ORDER-SERVICE
+              predicates:
+                - Path=/api/v1/work-order,/api/v1/work-order/**
+
+server:
+  port: 8080

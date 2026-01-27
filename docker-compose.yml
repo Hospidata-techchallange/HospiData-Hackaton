@@ -1,0 +1,157 @@
+version: "3.8"
+
+services:
+
+  config-service:
+    build:
+      dockerfile: Dockerfile.config-service
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - hospidata-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+
+  discovery-service:
+    build:
+      dockerfile: Dockerfile.discovery-service
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+
+  gateway-service:
+    build:
+      dockerfile: Dockerfile.gateway-service
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      stock-service: 
+        condition: service_healthy
+      work-order-service: 
+        condition: service_healthy   
+
+  auth-service:
+    build:
+      dockerfile: Dockerfile.auth-service
+    container_name: auth-service
+    ports:
+      - "8081:8081"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      hospidata-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  stock-service:
+    build:
+      dockerfile: Dockerfile.stock-service
+    container_name: stock-service
+    ports:
+      - "8082:8082"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      hospidata-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  work-order-service:
+    build:
+      dockerfile: Dockerfile.work-order-service
+    container_name: work-order-service
+    ports:
+      - "8083:8083"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      hospidata-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  hospidata-db:
+    build:
+      dockerfile: Dockerfile.hospidata-db
+    container_name: hospidata-db
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_hd_data:/var/lib/mysql
+    networks:
+      - hospidata-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mariadb_hd_data:
+
+networks:
+  hospidata-network:
+    driver: bridge

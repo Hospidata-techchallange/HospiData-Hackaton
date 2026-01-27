@@ -1,0 +1,26 @@
+spring :
+  datasource:
+    url: jdbc:mariadb://hospidata-db:3306/stock_schema
+    username: hospidata-user
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 600000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    properties:
+      hibernate:
+        format_sql: true
+
+server :
+  port : 8082
