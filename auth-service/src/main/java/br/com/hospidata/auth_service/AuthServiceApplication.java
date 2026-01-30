@@ -1,4 +1,4 @@
-package br.com.hospidata.auth._service;
+package br.com.hospidata.auth_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

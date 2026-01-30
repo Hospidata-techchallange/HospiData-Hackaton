@@ -15,3 +15,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://discovery-service:8761/eureka/
+
+jwt:
+  secret: b6b096c3-e08f-40dd-b1f3-f8ff1711ec6e
+  access-token-validity: 900000
+  refresh-token-validity: 604800000
