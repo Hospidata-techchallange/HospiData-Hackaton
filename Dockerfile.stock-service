@@ -1,6 +1,11 @@
 FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /build
+
+COPY ./common/pom.xml ./common/pom.xml
+COPY ./common/src ./common/src
+RUN mvn -f common/pom.xml clean install -DskipTests
+
 COPY ./stock-service/pom.xml ./
 COPY ./stock-service/src ./src
 RUN mvn clean install -DskipTests
