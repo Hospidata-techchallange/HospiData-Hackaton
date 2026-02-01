@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "tb_category")
-@SQLDelete(sql = "UPDATE tb_category SET active = false WHERE id = ?")
+@SQLDelete(sql = "UPDATE tb_category SET active = false WHERE id_category = ?")
 public class Category {
 
     @Id

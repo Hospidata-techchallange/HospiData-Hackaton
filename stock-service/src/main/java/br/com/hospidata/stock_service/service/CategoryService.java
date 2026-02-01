@@ -70,12 +70,43 @@ public class CategoryService {
         }
     }
 
-    public List<CategoryResponse> findAllCategories() {
-        return mapper.toResponses(repository.findAll());
+    @Transactional(readOnly = true)
+    public List<CategoryResponse> findAllCategories(Boolean active) {
+        if (active == null) {
+            return mapper.toResponses(repository.findAll());
+        }
+        return mapper.toResponses(repository.findByActive(active));
     }
 
+    @Transactional(readOnly = true)
     public CategoryResponse findCategoryById(UUID id) {
         return mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id.toString())));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id.toString())));
+    }
+
+    @Transactional
+    public CategoryResponse updateCategory(CategoryRequest categoryRequest, UUID id) {
+        Category category = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id.toString()));
+
+        category.setName(categoryRequest.name());
+        category.setDescription(categoryRequest.description());
+
+        return mapper.toResponse(repository.save(category));
+    }
+
+    @Transactional
+    public void deleteCategory(UUID id) {
+        mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id.toString())));
+        repository.deleteById(id);
+    }
+
+    @Transactional
+    public void enableCategoryById(UUID id) {
+        Category find = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id.toString()));
+        find.setActive(true);
+        repository.save(find);
     }
 }

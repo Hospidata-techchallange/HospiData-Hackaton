@@ -23,8 +23,10 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAllCategories());
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(
+            @RequestParam(required = false) Boolean active
+    ) {
+        return ResponseEntity.ok().body(service.findAllCategories(active));
     }
 
     @GetMapping("/{id}")
@@ -46,6 +48,28 @@ public class CategoryController {
                 .body(service.uploadCategories(file));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @RequestBody CategoryRequest categoryRequest,
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.updateCategory(categoryRequest , id));
+    }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(
+            @PathVariable UUID id
+    ) {
+        service.deleteCategory(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/enable/{id}")
+    public ResponseEntity<Void> enableCategory(
+            @PathVariable UUID id
+    ) {
+        service.enableCategoryById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
 }
