@@ -16,6 +16,9 @@ RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
 RUN mvn clean package -DskipTests -pl work-order-service -am
 
 FROM eclipse-temurin:21-jre-alpine
+
+RUN apk add --no-cache curl
+
 WORKDIR /app
 COPY --from=build /app/work-order-service/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,4 +1,4 @@
-git FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
 COPY pom.xml .
@@ -14,6 +14,9 @@ RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
 RUN mvn clean package -DskipTests -pl stock-service -am
 
 FROM eclipse-temurin:21-jre-alpine
+
+RUN apk add --no-cache curl
+
 WORKDIR /app
 COPY --from=build /app/stock-service/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
