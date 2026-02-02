@@ -1,0 +1,16 @@
+package br.com.hospidata.work_order_service.controller.dto;
+
+import br.com.hospidata.work_order_service.entity.enums.WorkOrderStatus;
+import lombok.Builder;
+import lombok.Data;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Data
+@Builder
+public class WorkOrderResponse {
+    private Long id;
+    private WorkOrderStatus status;
+    private LocalDateTime createdAt;
+    private List<PickingInstructionDTO> pickingInstructions;
+}
