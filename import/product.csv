@@ -1,0 +1,29 @@
+name,description,skuCode,categoryId,minStockAlert
+Álcool 70% Hospitalar,Solução antisséptica para higienização,ANTISEP-005,3105dcc9-1b92-4447-a2c7-08a50b77c49b,50
+Clorexidina Degermante,Solução antisséptica para pele e mãos,ANTISEP-006,3105dcc9-1b92-4447-a2c7-08a50b77c49b,30
+Soro Fisiológico 0.9%,Solução estéril para hidratação,SORO-001,c6e51d07-d466-4ceb-8c07-1e5058c48171,100
+Soro Glicosado 5%,Solução intravenosa,SORO-002,c6e51d07-d466-4ceb-8c07-1e5058c48171,80
+Luvas de Látex,Luva descartável para procedimentos,LAB-001,d51863b3-ca82-4685-b9d1-2155de285333,200
+Tubo de Ensaio Vidro,Tubo para coleta e análise,LAB-002,d51863b3-ca82-4685-b9d1-2155de285333,150
+Bisturi Descartável,Bisturi estéril de uso único,CIR-001,ec960bef-5076-47fa-92f4-2c6fe46a4487,60
+Fio de Sutura Nylon,Fio cirúrgico estéril,CIR-002,ec960bef-5076-47fa-92f4-2c6fe46a4487,120
+Tala Ortopédica,Tala para imobilização de membros,ORTO-001,19b4e987-ce39-47a5-a997-2e7effd5075f,40
+Colar Cervical,Suporte para imobilização cervical,ORTO-002,19b4e987-ce39-47a5-a997-2e7effd5075f,25
+Amoxicilina 500mg,Antibiótico de amplo espectro,ATB-001,3376dd46-9ca4-4205-96cd-5ee3deb862a0,70
+Cefalexina 500mg,Antibiótico oral,ATB-002,3376dd46-9ca4-4205-96cd-5ee3deb862a0,60
+Paracetamol 750mg,Medicamento antitérmico,ANTT-001,fb084e9f-fcbb-4dbd-8a81-767c80fb5903,90
+Dipirona 1g,Antitérmico e analgésico,ANTT-002,fb084e9f-fcbb-4dbd-8a81-767c80fb5903,100
+Monitor Multiparâmetro,Equipamento para monitoramento vital,EQP-001,fde85027-a5a0-4052-81a1-79db8488ac75,10
+Bomba de Infusão,Equipamento para administração controlada,EQP-002,fde85027-a5a0-4052-81a1-79db8488ac75,8
+Máscara Cirúrgica Descartável,Proteção respiratória,EPI-001,1b68d077-8099-437c-ab48-9d8042da9ba1,300
+Luvas Nitrílicas,Luva de proteção descartável,EPI-002,1b68d077-8099-437c-ab48-9d8042da9ba1,250
+Sabonete Antisséptico,Sabonete para higienização hospitalar,HIG-001,2a401d61-05c4-4a5a-90c9-9daa3cc6dc7f,70
+Papel Toalha Hospitalar,Papel descartável para secagem,HIG-002,2a401d61-05c4-4a5a-90c9-9daa3cc6dc7f,120
+Seringa 10ml,Seringa descartável,DES-001,203fd9aa-303e-4161-8365-ceec59499eec,400
+Agulha Hipodérmica,Agulha descartável estéril,DES-002,203fd9aa-303e-4161-8365-ceec59499eec,500
+Vacina Influenza,Vacina para prevenção da gripe,VAC-001,a7b1857b-eeb6-4712-8003-dfb72a92552d,30
+Vacina Hepatite B,Vacina imunizante,VAC-002,a7b1857b-eeb6-4712-8003-dfb72a92552d,25
+Morfina 10mg,Medicamento analgésico controlado,CTRL-001,0286fb4f-7e88-41b3-8b07-9023302157ca,15
+Diazepam 10mg,Medicamento ansiolítico,CTRL-002,0286fb4f-7e88-41b3-8b07-9023302157ca,20
+Oxigênio Medicinal,Cilindro de oxigênio hospitalar,OXY-001,7495dc47-d151-45f6-9ad6-ff235b3578c4,12
+Máscara de Oxigênio,Máscara para oxigenoterapia,OXY-002,7495dc47-d151-45f6-9ad6-ff235b3578c4,50

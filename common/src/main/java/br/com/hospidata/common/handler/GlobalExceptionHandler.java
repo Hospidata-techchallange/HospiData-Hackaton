@@ -37,6 +37,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(response);
     }
 
+    @ExceptionHandler(ListCannotEmpty.class)
+    public ResponseEntity<ErrorResponse> handleListCannotEmptyException(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        var status = HttpStatus.INTERNAL_SERVER_ERROR;
+        var response = new ErrorResponse(
+                Instant.now(),
+                status.value(),
+                ex.getMessage(),
+                request.getRequestURI(),
+                request.getMethod()
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlerResourceNotFoundExeception (
             ResourceNotFoundException e,
