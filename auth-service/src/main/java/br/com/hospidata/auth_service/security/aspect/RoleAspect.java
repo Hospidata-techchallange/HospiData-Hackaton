@@ -1,6 +1,7 @@
 package br.com.hospidata.auth_service.security.aspect;
 
 import br.com.hospidata.auth_service.service.AuthService;
+import br.com.hospidata.auth_service.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,15 +17,16 @@ import java.util.List;
 public class RoleAspect {
 
     private final AuthService authService;
+    private final TokenService tokenService;
 
-    public RoleAspect(AuthService authService) {
+    public RoleAspect(AuthService authService, TokenService tokenService) {
         this.authService = authService;
+        this.tokenService = tokenService;
     }
 
     @Before("@annotation(checkRole)")
     public void checkRole(JoinPoint jp, CheckRole checkRole) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String token = authService.getTokenFromCookie(request);
-        authService.validRoles(token, List.of(checkRole.value()));
+        tokenService.validRoles(request , List.of(checkRole.value()));
     }
 }

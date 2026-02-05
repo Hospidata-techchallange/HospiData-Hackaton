@@ -1,11 +1,13 @@
 package br.com.hospidata.auth_service.controller;
 
+import br.com.hospidata.auth_service.controller.dto.MeResponse;
 import br.com.hospidata.auth_service.controller.dto.error.AuthResponse;
 import br.com.hospidata.auth_service.controller.dto.LoginRequest;
 import br.com.hospidata.auth_service.controller.dto.UserResponse;
 import br.com.hospidata.auth_service.entity.User;
 import br.com.hospidata.auth_service.mapper.UserMappper;
 import br.com.hospidata.auth_service.service.AuthService;
+import br.com.hospidata.auth_service.service.TokenService;
 import br.com.hospidata.auth_service.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,16 +21,19 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
     private final UserMappper userMappper;
+    private final TokenService tokenService;
 
-    public AuthController(AuthService authService , UserService userService , UserMappper userMappper) {
+    public AuthController(AuthService authService , UserService userService , UserMappper userMappper, TokenService tokenService) {
         this.authService = authService;
         this.userService = userService;
         this.userMappper = userMappper;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest,
                                       HttpServletResponse response) {
+
         AuthResponse authResponse = authService.login(loginRequest);
 
         Cookie refreshCookie = new Cookie("refreshToken", authResponse.refreshToken());
@@ -94,9 +99,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse>  me(@CookieValue(value = "accessToken", required = false) String accessToken) {
-        User user = (userService.findUserByEmail(authService.getEmailFromAccessToken(accessToken)));
-        return ResponseEntity.ok().body(userMappper.toResponse(user));
+    public ResponseEntity<MeResponse>  me(@CookieValue(value = "accessToken", required = false) String accessToken) {
+        return ResponseEntity.ok().body(tokenService.getUserInformation(accessToken));
     }
 
 
