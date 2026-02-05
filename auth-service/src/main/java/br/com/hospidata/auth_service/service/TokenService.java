@@ -1,14 +1,22 @@
 package br.com.hospidata.auth_service.service;
 
+import br.com.hospidata.auth_service.controller.dto.MeResponse;
+import br.com.hospidata.auth_service.entity.enums.Role;
+import br.com.hospidata.auth_service.service.exceptions.AccessDeniedException;
+import br.com.hospidata.auth_service.service.exceptions.UnauthorizedException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TokenService {
@@ -29,18 +37,32 @@ public class TokenService {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateAccessToken(String username) {
+    public String generateAccessToken(
+            String userId,
+            String username,
+            String role
+    ) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username) // sub
+                .claim("user_id", userId)
+                .claim("email", username)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenValidity))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String username) {
+    public String generateRefreshToken(
+            String userId,
+            String username,
+            String role
+    ) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(username) // sub
+                .claim("user_id", userId)
+                .claim("email", username)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -63,5 +85,59 @@ public class TokenService {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public Claims getAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    public MeResponse getUserInformation(String accessToken) {
+        if (!this.validateToken(accessToken)) {
+            throw new UnauthorizedException("Access token invalid or expired");
+        }
+
+        Claims claims = this.getAllClaims(accessToken);
+
+        return new MeResponse(
+                claims.get("user_id", String.class),
+                claims.get("email", String.class),
+                claims.get("role", String.class)
+        );
+    }
+
+    public void validRoles(HttpServletRequest request, List<Role> allowedRoles) {
+
+        String accessToken = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (accessToken == null) {
+            throw new UnauthorizedException("Access token not found");
+        }
+
+        MeResponse meResponse = getUserInformation(accessToken);
+
+
+        Role userRole;
+        try {
+            userRole = Role.valueOf(meResponse.role());
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException("Invalid role in token");
+        }
+
+        if (!allowedRoles.contains(userRole)) {
+            throw new AccessDeniedException("You do not have permission to access this resource.");
+        }
     }
 }
