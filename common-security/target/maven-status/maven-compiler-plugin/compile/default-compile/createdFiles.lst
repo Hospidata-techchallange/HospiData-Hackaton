@@ -1,0 +1,8 @@
+br\com\hospidata\common_security\aspect\RoleAspect.class
+br\com\hospidata\common_security\config\ResourceServerSecurityConfig.class
+br\com\hospidata\common_security\service\TokenService.class
+br\com\hospidata\common_security\Main.class
+br\com\hospidata\common_security\dto\MeResponse.class
+br\com\hospidata\common_security\aspect\CheckRole.class
+br\com\hospidata\common_security\config\ResourceServerSecurityConfig$JwtAuthFilter.class
+br\com\hospidata\common_security\enums\Role.class

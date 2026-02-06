@@ -1,8 +1,9 @@
 package br.com.hospidata.stock_service.controller;
 
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import br.com.hospidata.stock_service.controller.dto.ProductRequest;
 import br.com.hospidata.stock_service.controller.dto.ProductResponse;
-import br.com.hospidata.stock_service.entity.Product;
 import br.com.hospidata.stock_service.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +24,13 @@ public class ProductController {
     }
 
     @PostMapping
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<ProductResponse>> addProduct(@RequestBody List<ProductRequest> requests) throws Exception {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createProducts(requests));
     }
 
     @PostMapping("/upload")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<ProductResponse>> uploadProduct(
             @RequestParam("file") MultipartFile file
     ) {
@@ -37,6 +40,7 @@ public class ProductController {
     }
 
     @GetMapping
+    @CheckRole({Role.NURSE , Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<ProductResponse>> getAllProducts(
             @RequestParam(required = false) Boolean active
     ) {
@@ -44,11 +48,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.NURSE , Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.findProductById(id));
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<Void> deleteProductById(
             @PathVariable UUID id
     ) {
@@ -57,6 +63,7 @@ public class ProductController {
     }
 
     @PatchMapping("/enable/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<Void> enableProductById(
             @PathVariable UUID id
     ) {
@@ -65,6 +72,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<ProductResponse> updateProductById(
             @RequestBody ProductRequest request,
             @PathVariable UUID id

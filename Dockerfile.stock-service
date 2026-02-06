@@ -3,6 +3,8 @@ WORKDIR /app
 
 COPY pom.xml .
 COPY common common
+COPY common-security common-security
+
 COPY stock-service stock-service
 
 RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \

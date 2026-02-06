@@ -1,5 +1,7 @@
 package br.com.hospidata.stock_service.controller;
 
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import br.com.hospidata.stock_service.controller.dto.CategoryRequest;
 import br.com.hospidata.stock_service.controller.dto.CategoryResponse;
 import br.com.hospidata.stock_service.mapper.CategoryMapper;
@@ -22,7 +24,9 @@ public class CategoryController {
         this.service = service;
     }
 
+
     @GetMapping
+    @CheckRole({Role.NURSE , Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<CategoryResponse>> getAllCategories(
             @RequestParam(required = false) Boolean active
     ) {
@@ -30,16 +34,19 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.NURSE , Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(service.findCategoryById(id));
     }
 
     @PostMapping
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<CategoryResponse>> createCategory(@RequestBody List<CategoryRequest> request){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createCategories(request));
     }
 
     @PostMapping("/upload")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<List<CategoryResponse>> uploadCategories(
             @RequestParam("file") MultipartFile file
     ) {
@@ -49,6 +56,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<CategoryResponse> updateCategory(
             @RequestBody CategoryRequest categoryRequest,
             @PathVariable UUID id
@@ -57,6 +65,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<Void> deleteCategory(
             @PathVariable UUID id
     ) {
@@ -65,6 +74,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/enable/{id}")
+    @CheckRole({Role.PHARMACIST , Role.ADMIN})
     public ResponseEntity<Void> enableCategory(
             @PathVariable UUID id
     ) {
