@@ -97,8 +97,8 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(UUID id) {
-         mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString())));
+        repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString()));
          repository.deleteById(id);
     }
 
