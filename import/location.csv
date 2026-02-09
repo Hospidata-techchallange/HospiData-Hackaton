@@ -1,0 +1,16 @@
+aisle,shelf,bin,description
+C-01,P-01,BX-01,Medicamentos controlados
+C-01,P-01,BX-02,Analgésicos e antitérmicos
+C-01,P-02,BX-01,Antibióticos
+C-01,P-02,BX-02,Anti-inflamatórios
+C-02,P-01,BX-01,Materiais hospitalares
+C-02,P-01,BX-02,Equipamentos médicos
+C-02,P-02,BX-01,Soros e soluções intravenosas
+C-02,P-02,BX-03,Soluções antissépticas
+C-03,P-01,BX-01,Termolábeis refrigerados
+C-03,P-01,BX-02,Vacinas
+C-03,P-02,BX-04,Insulinas
+C-04,P-01,BX-01,EPI - Luvas e máscaras
+C-04,P-02,BX-02,EPI - Aventais descartáveis
+C-05,P-01,BX-01,Medicamentos de alto custo
+C-05,P-02,BX-03,Produtos controlados especiais

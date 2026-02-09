@@ -1,9 +1,0 @@
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\dto\error\AuthResponse.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\dto\error\ErrorResponse.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\dto\error\ErrorResponseInternal.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\dto\error\ValidationError.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\exceptions\AccessDeniedException.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\exceptions\DuplicateKeyException.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\exceptions\ResourceNotFoundException.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\exceptions\UnauthorizedException.java
-C:\Users\matheusfcardoso\Documents\FIAP-TechChalenger\hospidata-hackaton\common\src\main\java\br\com\hospidata\common\handler\GlobalExceptionHandler.java

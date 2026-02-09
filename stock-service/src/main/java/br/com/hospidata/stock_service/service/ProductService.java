@@ -12,13 +12,11 @@ import br.com.hospidata.stock_service.repository.CategoryRepository;
 import br.com.hospidata.stock_service.repository.ProductRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -82,7 +80,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> findAllCategoris(Boolean active) {
+    public List<ProductResponse> findAllProducts(Boolean active) {
         if (active == null) {
             return mapper.toResponses(repository.findAll());
         }
@@ -97,8 +95,8 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(UUID id) {
-         mapper.toResponse(repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString())));
+        repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id.toString()));
          repository.deleteById(id);
     }
 
@@ -160,7 +158,10 @@ public class ProductService {
 
             return saved;
 
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException | IllegalArgumentException | DuplicateKeyException e) {
+            throw e;
+        }
+        catch (Exception e) {
             throw new RuntimeException("Erro ao processar o CSV", e);
         }
 

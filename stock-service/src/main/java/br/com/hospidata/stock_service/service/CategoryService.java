@@ -60,9 +60,7 @@ public class CategoryService {
                     .parse(reader);
 
             List<Category> categories = mapper.fromCsv(parser);
-
             List<Category> saved = repository.saveAll(categories);
-
             return mapper.toResponses(saved);
 
         } catch (IOException e) {

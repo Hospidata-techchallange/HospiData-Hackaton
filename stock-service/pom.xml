@@ -89,6 +89,21 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Common Security -->
+        <dependency>
+            <groupId>br.com.hospidata</groupId>
+            <artifactId>common-security</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!--RQSL-->
+        <dependency>
+            <groupId>io.github.perplexhub</groupId>
+            <artifactId>rsql-jpa-specification</artifactId>
+            <version>6.0.6</version>
+        </dependency>
+
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
