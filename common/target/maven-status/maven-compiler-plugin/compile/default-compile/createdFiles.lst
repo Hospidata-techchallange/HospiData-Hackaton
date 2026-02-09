@@ -1,9 +1,0 @@
-br\com\hospidata\common\exceptions\ResourceNotFoundException.class
-br\com\hospidata\common\dto\error\ValidationError.class
-br\com\hospidata\common\exceptions\DuplicateKeyException.class
-br\com\hospidata\common\exceptions\UnauthorizedException.class
-br\com\hospidata\common\handler\GlobalExceptionHandler.class
-br\com\hospidata\common\dto\error\ErrorResponseInternal.class
-br\com\hospidata\common\dto\error\AuthResponse.class
-br\com\hospidata\common\dto\error\ErrorResponse.class
-br\com\hospidata\common\exceptions\AccessDeniedException.class
