@@ -7,6 +7,7 @@ import br.com.hospidata.common_security.service.TokenService;
 import br.com.hospidata.stock_service.controller.dto.BatchRequest;
 import br.com.hospidata.stock_service.controller.dto.BatchRequestUpdate;
 import br.com.hospidata.stock_service.controller.dto.BatchResponse;
+import br.com.hospidata.stock_service.controller.dto.StockReductionRequest;
 import br.com.hospidata.stock_service.service.BatchService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -112,6 +113,12 @@ public class BatchController {
     ) {
         MeResponse user = tokenService.getUserInformation(accessToken);
         return ResponseEntity.status(HttpStatus.CREATED).body(service.uploadBatches(file, user.email()))  ;
+    }
+
+    @PostMapping("/reduce")
+    public ResponseEntity<Void> reduceStock(@RequestBody List<StockReductionRequest> requests) {
+        service.reduceStock(requests, "SYSTEM_WORK_ORDER");
+        return ResponseEntity.noContent().build();
     }
 
 }

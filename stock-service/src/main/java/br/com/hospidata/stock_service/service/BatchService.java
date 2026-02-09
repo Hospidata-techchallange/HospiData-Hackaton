@@ -7,10 +7,12 @@ import br.com.hospidata.stock_service.controller.dto.*;
 import br.com.hospidata.stock_service.entity.Batch;
 import br.com.hospidata.stock_service.entity.Location;
 import br.com.hospidata.stock_service.entity.Product;
+import br.com.hospidata.stock_service.entity.StockMovement;
 import br.com.hospidata.stock_service.mapper.BatchMapper;
 import br.com.hospidata.stock_service.repository.BatchRepository;
 import br.com.hospidata.stock_service.repository.LocationRepository;
 import br.com.hospidata.stock_service.repository.ProductRepository;
+import br.com.hospidata.stock_service.repository.StockMovementRepository;
 import cz.jirutka.rsql.parser.RSQLParser;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -19,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,15 +41,19 @@ import java.util.stream.Collectors;
 @Service
 public class BatchService {
 
+    private static final Logger logger = LoggerFactory.getLogger(BatchService.class);
+
     private final BatchRepository repository;
     private final ProductRepository productRepository;
     private final LocationRepository locationRepository;
+    private final StockMovementRepository movementRepository;
     private final BatchMapper mapper;
 
-    public BatchService(BatchRepository repository, ProductRepository productRepository, LocationRepository locationRepository, BatchMapper mapper) {
+    public BatchService(BatchRepository repository, ProductRepository productRepository, LocationRepository locationRepository, BatchMapper mapper,StockMovementRepository movementRepository) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.locationRepository = locationRepository;
+        this.movementRepository = movementRepository;
         this.mapper = mapper;
     }
 
@@ -210,5 +218,49 @@ public class BatchService {
         return repository
                 .findAll(spec, pageable)
                 .map(mapper::toResponse);
+    }
+
+    @Transactional
+    public void reduceStock(List<StockReductionRequest> items, String user) {
+        for (StockReductionRequest item : items) {
+            Batch batch = repository.findById(item.batchId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", item.batchId().toString()));
+
+            if (batch.getQuantityAvailable() < item.quantity()) {
+                throw new IllegalArgumentException("Estoque insuficiente para o lote: " + batch.getBatchNumber());
+            }
+
+            // 1. Atualiza Quantidade
+            batch.setQuantityAvailable(batch.getQuantityAvailable() - item.quantity());
+            batch.setLastModifiedBy(user);
+
+            if (batch.getQuantityAvailable() == 0) {
+                batch.setActive(false);
+            }
+            repository.save(batch);
+
+            // 2. Grava Histórico de Movimentação (Tabela tb_stock_movement)
+            StockMovement movement = StockMovement.builder()
+                    .batch(batch)
+                    .quantity(item.quantity())
+                    .movementType("OUT")
+                    .reason("Work Order Fulfillment")
+                    .createdBy(user)
+                    .build();
+            movementRepository.save(movement);
+
+            // 3. Verifica Alerta de Estoque Mínimo
+            checkMinStockAlert(batch.getProduct());
+        }
+    }
+
+    private void checkMinStockAlert(Product product) {
+        Integer totalStock = repository.getTotalQuantityByProductId(product.getId());
+        if (totalStock == null) totalStock = 0;
+
+        if (totalStock <= product.getMinStockAlert()) {
+            logger.warn("ALERTA DE ESTOQUE BAIXO: Produto '{}' (SKU: {}) tem apenas {} unidades. Mínimo é {}.",
+                    product.getName(), product.getSkuCode(), totalStock, product.getMinStockAlert());
+        }
     }
 }
