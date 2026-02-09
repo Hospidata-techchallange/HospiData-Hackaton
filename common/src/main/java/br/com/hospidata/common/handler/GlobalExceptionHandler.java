@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -132,6 +133,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(new ValidationError(errors , status , method , path));
 
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUUID(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest request
+    ) {
+
+        var status = HttpStatus.BAD_REQUEST.value();
+        var method = request.getMethod();
+        var path = request.getRequestURI();
+
+        return ResponseEntity.badRequest().body(
+                new ErrorResponse(Instant.now() , status , ex.getMessage(), method , path)
+        );
     }
 
 }

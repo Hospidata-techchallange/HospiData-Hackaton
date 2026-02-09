@@ -44,7 +44,7 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getAllProducts(
             @RequestParam(required = false) Boolean active
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.findAllCategoris(active));
+        return ResponseEntity.status(HttpStatus.OK).body(service.findAllProducts(active));
     }
 
     @GetMapping("/{id}")
