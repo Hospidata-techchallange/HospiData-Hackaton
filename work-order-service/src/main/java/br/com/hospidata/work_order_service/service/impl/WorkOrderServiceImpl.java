@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -49,6 +50,10 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         List<PickingInstructionDTO> instructions = generatePickingInstructions(items);
 
+        BigDecimal totalOrderCost = instructions.stream()
+                .map(PickingInstructionDTO::getTotalCost)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         List<StockReductionDTO> reductionRequests = instructions.stream()
                 .map(instr -> StockReductionDTO.builder()
                         .batchId(instr.getBatchId())
@@ -68,6 +73,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 .id(savedOrder.getId())
                 .status(savedOrder.getStatus())
                 .createdAt(savedOrder.getCreatedAt())
+                .totalOrderCost(totalOrderCost)
                 .pickingInstructions(instructions)
                 .build();
     }
@@ -90,8 +96,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
         for (WorkOrderItem item : items) {
             List<BatchDTO> batches = stockClient.getAvailableBatches(item.getProductId());
-
-            batches.sort(Comparator.comparing(BatchDTO::getExpirationDate));
+            batches.sort(Comparator.comparing(BatchDTO::getExpirationDate)); // FEFO
 
             int remainingQty = item.getQuantityRequested();
 
@@ -100,6 +105,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
 
                 int quantityToTake = Math.min(remainingQty, batch.getQuantityAvailable());
 
+                BigDecimal unitPrice = batch.getUnitPrice() != null ? batch.getUnitPrice() : BigDecimal.ZERO;
+                BigDecimal cost = unitPrice.multiply(BigDecimal.valueOf(quantityToTake));
+
                 instructions.add(PickingInstructionDTO.builder()
                         .productId(item.getProductId())
                         .batchId(batch.getId())
@@ -107,6 +115,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                         .expirationDate(batch.getExpirationDate())
                         .location(String.format("Corredor: %s, Prateleira: %s, Seção: %s",
                                 batch.getAisle(), batch.getShelf(), batch.getSection()))
+                        .unitPrice(unitPrice)
+                        .totalCost(cost)
                         .build());
 
                 remainingQty -= quantityToTake;
