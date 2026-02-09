@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.UUID;
 
 @FeignClient(name = "stock-service")
 public interface StockClient {
 
     @GetMapping("/api/batches/product/{productId}/available")
-    List<BatchDTO> getAvailableBatches(@PathVariable("productId") Long productId);
+    List<BatchDTO> getAvailableBatches(@PathVariable("productId") UUID productId);
 
     @PostMapping("/batches/reduce")
     void reduceStock(@RequestBody List<StockReductionDTO> requests);
