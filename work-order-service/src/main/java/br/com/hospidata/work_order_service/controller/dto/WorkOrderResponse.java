@@ -6,11 +6,12 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 public class WorkOrderResponse {
-    private Long id;
+    private UUID id;
     private WorkOrderStatus status;
     private LocalDateTime createdAt;
     private BigDecimal totalOrderCost;
