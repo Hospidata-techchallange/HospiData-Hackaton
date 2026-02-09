@@ -211,4 +211,25 @@ public class BatchService {
                 .findAll(spec, pageable)
                 .map(mapper::toResponse);
     }
+
+    @Transactional
+    public void reduceStock(List<StockReductionRequest> items, String user) {
+        for (StockReductionRequest item : items) {
+            Batch batch = repository.findById(item.batchId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", item.batchId().toString()));
+
+            if (batch.getQuantityAvailable() < item.quantity()) {
+                throw new IllegalArgumentException("Estoque insuficiente para o lote: " + batch.getBatchNumber());
+            }
+
+            batch.setQuantityAvailable(batch.getQuantityAvailable() - item.quantity());
+            batch.setLastModifiedBy(user);
+
+            if (batch.getQuantityAvailable() == 0) {
+                batch.setActive(false);
+            }
+
+            repository.save(batch);
+        }
+    }
 }

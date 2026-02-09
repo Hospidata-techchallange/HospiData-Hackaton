@@ -7,6 +7,7 @@ import br.com.hospidata.work_order_service.entity.WorkOrderItem;
 import br.com.hospidata.work_order_service.entity.enums.WorkOrderStatus;
 import br.com.hospidata.work_order_service.integration.stock.StockClient;
 import br.com.hospidata.work_order_service.integration.stock.dto.BatchDTO;
+import br.com.hospidata.work_order_service.integration.stock.dto.StockReductionDTO;
 import br.com.hospidata.work_order_service.repository.WorkOrderRepository;
 import br.com.hospidata.work_order_service.service.WorkOrderService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     @Override
     @Transactional
     public WorkOrderResponse createOrder(WorkOrderRequest request) {
+
         WorkOrder workOrder = WorkOrder.builder()
                 .userId(request.getUserId())
                 .description(request.getDescription())
@@ -44,9 +46,23 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 .collect(Collectors.toList());
 
         workOrder.setItems(items);
-        WorkOrder savedOrder = repository.save(workOrder);
 
         List<PickingInstructionDTO> instructions = generatePickingInstructions(items);
+
+        List<StockReductionDTO> reductionRequests = instructions.stream()
+                .map(instr -> StockReductionDTO.builder()
+                        .batchId(instr.getBatchId())
+                        .quantity(instr.getQuantityToPick())
+                        .build())
+                .collect(Collectors.toList());
+
+        try {
+            stockClient.reduceStock(reductionRequests);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao reservar estoque: " + e.getMessage());
+        }
+
+        WorkOrder savedOrder = repository.save(workOrder);
 
         return WorkOrderResponse.builder()
                 .id(savedOrder.getId())

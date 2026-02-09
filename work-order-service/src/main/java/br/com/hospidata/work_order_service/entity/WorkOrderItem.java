@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,7 +25,7 @@ public class WorkOrderItem {
     private WorkOrder workOrder;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private UUID productId;
 
     @Column(name = "quantity_requested", nullable = false)
     private Integer quantityRequested;
