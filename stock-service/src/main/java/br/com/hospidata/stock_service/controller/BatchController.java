@@ -4,10 +4,7 @@ import br.com.hospidata.common_security.aspect.CheckRole;
 import br.com.hospidata.common_security.dto.MeResponse;
 import br.com.hospidata.common_security.enums.Role;
 import br.com.hospidata.common_security.service.TokenService;
-import br.com.hospidata.stock_service.controller.dto.BatchRequest;
-import br.com.hospidata.stock_service.controller.dto.BatchRequestUpdate;
-import br.com.hospidata.stock_service.controller.dto.BatchResponse;
-import br.com.hospidata.stock_service.controller.dto.StockReductionRequest;
+import br.com.hospidata.stock_service.controller.dto.*;
 import br.com.hospidata.stock_service.service.BatchService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -119,6 +116,19 @@ public class BatchController {
     public ResponseEntity<Void> reduceStock(@RequestBody List<StockReductionRequest> requests) {
         service.reduceStock(requests, "SYSTEM_WORK_ORDER");
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/restore")
+    @CheckRole({Role.NURSE, Role.PHARMACIST, Role.ADMIN}) // ADICIONADO
+    public ResponseEntity<Void> restoreStock(@RequestBody List<StockRestoreRequest> requests) {
+        service.restoreStock(requests, "SYSTEM_WORK_ORDER_RESTORE");
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/product/{productId}/available")
+    @CheckRole({Role.NURSE, Role.PHARMACIST, Role.ADMIN})
+    public ResponseEntity<List<BatchResponse>> getAvailableBatches(@PathVariable UUID productId) {
+        return ResponseEntity.ok(service.findBatchesByProductId(productId));
     }
 
 }

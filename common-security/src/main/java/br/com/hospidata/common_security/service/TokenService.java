@@ -113,7 +113,12 @@ public class TokenService {
 
         String accessToken = null;
 
-        if (request.getCookies() != null) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            accessToken = header.substring(7);
+        }
+
+        if (accessToken == null && request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("accessToken".equals(cookie.getName())) {
                     accessToken = cookie.getValue();
@@ -127,7 +132,6 @@ public class TokenService {
         }
 
         MeResponse meResponse = getUserInformation(accessToken);
-
 
         Role userRole;
         try {

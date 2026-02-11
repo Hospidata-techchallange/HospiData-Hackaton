@@ -230,7 +230,6 @@ public class BatchService {
                 throw new IllegalArgumentException("Estoque insuficiente para o lote: " + batch.getBatchNumber());
             }
 
-            // 1. Atualiza Quantidade
             batch.setQuantityAvailable(batch.getQuantityAvailable() - item.quantity());
             batch.setLastModifiedBy(user);
 
@@ -239,7 +238,6 @@ public class BatchService {
             }
             repository.save(batch);
 
-            // 2. Grava Histórico de Movimentação (Tabela tb_stock_movement)
             StockMovement movement = StockMovement.builder()
                     .batch(batch)
                     .quantity(item.quantity())
@@ -249,8 +247,38 @@ public class BatchService {
                     .build();
             movementRepository.save(movement);
 
-            // 3. Verifica Alerta de Estoque Mínimo
             checkMinStockAlert(batch.getProduct());
+        }
+    }
+
+    @Transactional
+    public void restoreStock(List<StockRestoreRequest> items, String user) {
+        for (StockRestoreRequest item : items) {
+            List<Batch> activeBatches = repository.findByActive(true).stream()
+                    .filter(b -> b.getProduct().getId().equals(item.getProductId()))
+                    .sorted(Comparator.comparing(Batch::getExpirationDate)) // Pega o que vence primeiro ou último, aqui optei por manter ordem de data
+                    .collect(Collectors.toList());
+
+            if (activeBatches.isEmpty()) {
+                throw new ResourceNotFoundException("Não há lotes ativos para devolver o produto ID: " + item.getProductId() + ". Ative um lote manualmente.");
+            }
+
+            Batch targetBatch = activeBatches.get(0);
+
+            targetBatch.setQuantityAvailable(targetBatch.getQuantityAvailable() + item.getQuantity());
+            targetBatch.setLastModifiedBy(user);
+            repository.save(targetBatch);
+
+            StockMovement movement = StockMovement.builder()
+                    .batch(targetBatch)
+                    .quantity(item.getQuantity())
+                    .movementType("IN")
+                    .reason("Work Order Cancelled / Restored")
+                    .createdBy(user)
+                    .build();
+            movementRepository.save(movement);
+
+            logger.info("Estoque restaurado: +{} itens do produto {} no lote {}", item.getQuantity(), item.getProductId(), targetBatch.getBatchNumber());
         }
     }
 
@@ -263,4 +291,12 @@ public class BatchService {
                     product.getName(), product.getSkuCode(), totalStock, product.getMinStockAlert());
         }
     }
+
+    public List<BatchResponse> findBatchesByProductId(UUID productId) {
+        List<Batch> batches = repository.findByProductIdAndActiveTrue(productId);
+        return batches.stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -17,4 +17,6 @@ public interface BatchRepository extends JpaRepository<Batch, UUID> , JpaSpecifi
 
     @Query("SELECT SUM(b.quantityAvailable) FROM Batch b WHERE b.product.id = :productId AND b.active = true")
     Integer getTotalQuantityByProductId(@Param("productId") UUID productId);
+
+    List<Batch> findByProductIdAndActiveTrue(UUID productId);
 }

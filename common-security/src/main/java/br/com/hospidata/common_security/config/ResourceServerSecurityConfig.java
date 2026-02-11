@@ -33,14 +33,13 @@ public class ResourceServerSecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers("/api/v1/user/**").permitAll()
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
-//                        .requestMatchers("/actuator/prometheus").permitAll()
-                                .requestMatchers("/actuator/**").permitAll()
-                                .anyRequest().authenticated()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/user/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         new JwtAuthFilter(tokenService),
@@ -62,7 +61,13 @@ public class ResourceServerSecurityConfig {
         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws java.io.IOException, jakarta.servlet.ServletException {
 
             String token = null;
-            if (request.getCookies() != null) {
+
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                token = header.substring(7);
+            }
+
+            if (token == null && request.getCookies() != null) {
                 for (Cookie cookie : request.getCookies()) {
                     if ("accessToken".equals(cookie.getName())) {
                         token = cookie.getValue();
@@ -81,5 +86,4 @@ public class ResourceServerSecurityConfig {
             filterChain.doFilter(request, response);
         }
     }
-
 }
