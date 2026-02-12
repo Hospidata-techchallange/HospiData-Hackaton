@@ -38,14 +38,14 @@ public class AuthController {
 
         Cookie refreshCookie = new Cookie("refreshToken", authResponse.refreshToken());
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/auth/refresh");
         refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7 dias
         response.addCookie(refreshCookie);
 
         Cookie accessCookie = new Cookie("accessToken", authResponse.accessToken());
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(15 * 60); // 15 minutos
         response.addCookie(accessCookie);
@@ -64,14 +64,14 @@ public class AuthController {
 
         Cookie refreshCookie = new Cookie("refreshToken", newTokens.refreshToken());
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/auth/refresh");
         refreshCookie.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(refreshCookie);
 
         Cookie accessCookie = new Cookie("accessToken", newTokens.accessToken());
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(15 * 60);
         response.addCookie(accessCookie);
@@ -83,14 +83,14 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie refreshCookie = new Cookie("refreshToken", null);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/auth/refresh");
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);
 
         Cookie accessCookie = new Cookie("accessToken", null);
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(0);
         response.addCookie(accessCookie);
