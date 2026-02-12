@@ -1,18 +1,24 @@
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+WORKDIR /app
 
-WORKDIR /build
-COPY ./stock-service/pom.xml ./
-COPY ./stock-service/src ./src
-RUN mvn clean install -DskipTests
+COPY pom.xml .
+COPY common common
+COPY common-security common-security
 
-FROM eclipse-temurin:21-jdk-alpine
+COPY stock-service stock-service
+
+RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
+    sed -i 's|<module>gateway-service</module>||g' pom.xml && \
+    sed -i 's|<module>auth-service</module>||g' pom.xml && \
+    sed -i 's|<module>work-order-service</module>||g' pom.xml && \
+    sed -i 's|<module>config-service</module>||g' pom.xml
+
+RUN mvn clean package -DskipTests -pl stock-service -am
+
+FROM eclipse-temurin:21-jre-alpine
 
 RUN apk add --no-cache curl
 
 WORKDIR /app
-COPY --from=builder /build/target/stock-service-1.0.0.jar app.jar
-
-RUN mkdir -p /app/logs
-
-EXPOSE 8082
+COPY --from=build /app/stock-service/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

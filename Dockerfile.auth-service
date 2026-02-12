@@ -1,18 +1,24 @@
-FROM maven:3.9-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+WORKDIR /app
 
-WORKDIR /build
-COPY ./auth-service/pom.xml ./
-COPY ./auth-service/src ./src
-RUN mvn clean install -DskipTests
+COPY pom.xml .
+COPY common common
+COPY common-security common-security
 
-FROM eclipse-temurin:21-jdk-alpine
+COPY auth-service auth-service
+
+RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
+    sed -i 's|<module>gateway-service</module>||g' pom.xml && \
+    sed -i 's|<module>stock-service</module>||g' pom.xml && \
+    sed -i 's|<module>work-order-service</module>||g' pom.xml && \
+    sed -i 's|<module>config-service</module>||g' pom.xml
+
+RUN mvn clean package -DskipTests -pl auth-service -am
+
+FROM eclipse-temurin:21-jre-alpine
 
 RUN apk add --no-cache curl
 
 WORKDIR /app
-COPY --from=builder /build/target/auth-service-1.0.0.jar app.jar
-
-RUN mkdir -p /app/logs
-
-EXPOSE 8081
+COPY --from=build /app/auth-service/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
