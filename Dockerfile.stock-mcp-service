@@ -5,21 +5,21 @@ COPY pom.xml .
 COPY common common
 COPY common-security common-security
 
-COPY auth-service auth-service
+COPY stock-mcp-service stock-mcp-service
 
 RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
     sed -i 's|<module>gateway-service</module>||g' pom.xml && \
-    sed -i 's|<module>stock-service</module>||g' pom.xml && \
+    sed -i 's|<module>auth-service</module>||g' pom.xml && \
     sed -i 's|<module>work-order-service</module>||g' pom.xml && \
-    sed -i 's|<module>stock-mcp-service</module>||g' pom.xml && \
+    sed -i 's|<module>stock-service</module>||g' pom.xml && \
     sed -i 's|<module>config-service</module>||g' pom.xml
 
-RUN mvn clean package -DskipTests -pl auth-service -am
+RUN mvn clean package -DskipTests -pl stock-mcp-service -am
 
 FROM eclipse-temurin:21-jre-alpine
 
 RUN apk add --no-cache curl
 
 WORKDIR /app
-COPY --from=build /app/auth-service/target/*.jar app.jar
+COPY --from=build /app/stock-mcp-service/target/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

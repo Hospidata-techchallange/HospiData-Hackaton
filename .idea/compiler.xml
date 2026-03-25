@@ -22,6 +22,7 @@
         <module name="common" />
         <module name="discovery-service" />
         <module name="gateway-service" />
+        <module name="stock-mcp-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -33,6 +34,7 @@
       <module name="config-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />
       <module name="gateway-service" options="-parameters" />
+      <module name="stock-mcp-service" options="-parameters" />
       <module name="stock-service" options="-parameters" />
       <module name="work-order-service" options="-parameters" />
     </option>

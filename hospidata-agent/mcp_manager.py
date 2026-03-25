@@ -1,12 +1,13 @@
-from agents.mcp import MCPServerStdio
+from agents.mcp.server import MCPServerStreamableHttp
+from dotenv import load_dotenv
+import os
 
 class MCPManager:
-    
+
     @staticmethod
     def get_server():
-        return MCPServerStdio(
-            params={
-                "command": "mcp",
-                "args": ["run", "servers/stock-mcp-server.py"]
+        return MCPServerStreamableHttp(
+            {
+                "url": os.getenv("STOCK_MCP_SERVER")
             }
         )
