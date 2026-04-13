@@ -150,4 +150,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(
+            BadRequestException ex,
+            HttpServletRequest request
+    ) {
+        var status = HttpStatus.BAD_REQUEST.value();
+        var method = request.getMethod();
+        var path = request.getRequestURI();
+
+        log.warn("Bad Request: [{} {}] - {}", method, path, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                new ErrorResponse(Instant.now() , status , ex.getMessage(), method , path)
+        );
+    }
+
 }

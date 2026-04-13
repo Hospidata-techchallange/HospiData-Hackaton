@@ -130,10 +130,10 @@ services:
       start_period: 40s
 
 
-  stock-mcp-service:
+  appointment-service:
     build:
-      dockerfile: Dockerfile.stock-mcp-service
-    container_name: stock-mcp-service
+      dockerfile: Dockerfile.appointment-service
+    container_name: appointment-service
     ports:
       - "8084:8084"
     networks:
@@ -148,6 +148,30 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8084/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+
+  stock-mcp-service:
+    build:
+      dockerfile: Dockerfile.stock-mcp-service
+    container_name: stock-mcp-service
+    ports:
+      - "8085:8085"
+    networks:
+      - hospidata-network
+    restart: always
+    depends_on:
+      config-service:
+        condition: service_healthy
+      discovery-service:
+        condition: service_healthy
+      hospidata-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 5
