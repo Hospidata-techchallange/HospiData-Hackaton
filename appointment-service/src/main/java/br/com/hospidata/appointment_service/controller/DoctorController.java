@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/appointment/doctor")
@@ -36,6 +37,27 @@ public class DoctorController {
         return ResponseEntity.ok().body(service.findAllDoctors(active));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable UUID id) {
+        return ResponseEntity.ok().body(service.findDoctorById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDoctorById(@PathVariable UUID id) {
+        service.deleteDoctor(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/enable/{id}")
+    public ResponseEntity<Void> enableDoctor(@PathVariable UUID id) {
+        service.enableDoctor(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DoctorResponse> updateDoctorById(@PathVariable UUID id, @RequestBody DoctorRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(service.updateDoctor(id, request));
+    }
 
 
 }

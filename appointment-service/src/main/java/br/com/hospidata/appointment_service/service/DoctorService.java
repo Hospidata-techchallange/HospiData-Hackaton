@@ -13,7 +13,9 @@ import br.com.hospidata.common.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,12 +23,12 @@ import java.util.UUID;
 public class DoctorService {
 
     private final DoctorRepository repository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
     private final DoctorMapper mapper;
 
-    public DoctorService(DoctorRepository repository, CategoryRepository categoryRepository, DoctorMapper mapper) {
+    public DoctorService(DoctorRepository repository, CategoryService categoryService, DoctorMapper mapper) {
         this.repository = repository;
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
         this.mapper = mapper;
     }
 
@@ -34,26 +36,7 @@ public class DoctorService {
     @Transactional
     public DoctorResponse createDoctor(DoctorRequest request) {
 
-        List<UUID> categoryIds;
-
-        try {
-            categoryIds = request.categoryIds()
-                    .stream()
-                    .map(UUID::fromString)
-                    .toList();
-        } catch (IllegalArgumentException ex) {
-            throw new BadRequestException(
-                    "Category",
-                    "categoryIds",
-                    "one or more UUIDs are invalid"
-            );
-        }
-
-        List<Category> categories = categoryRepository.findAllById(categoryIds);
-
-        if (categories.size() != categoryIds.size()) {
-            throw new ResourceNotFoundException("Category", "id", categoryIds.toString());
-        }
+        var categories = categoryService.findCategoriesByIds(request.categoryIds());
 
         var result = repository.save(mapper.toEntity(request , categories));
         return mapper.toResponse(result);
@@ -66,6 +49,51 @@ public class DoctorService {
         }
         return mapper.toResponses(repository.findByActive(active));
 
+    }
+
+    @Transactional(readOnly = true)
+    public DoctorResponse findDoctorById(UUID id) {
+        return mapper.toResponse(repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString())));
+    }
+
+    @Transactional
+    public void deleteDoctor(UUID id) {
+        Doctor find = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString()));
+        find.setActive(false);
+        repository.save(find);
+    }
+
+    @Transactional
+    public void enableDoctor(UUID id) {
+        Doctor find = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString()));
+        find.setActive(true);
+        repository.save(find);
+    }
+
+    @Transactional
+    public DoctorResponse updateDoctor(UUID id, DoctorRequest request) {
+
+        var categories = categoryService.findCategoriesByIds(request.categoryIds());
+
+        Doctor doctor = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString()));
+
+        updateDoctorFields(doctor, request, categories);
+
+        return mapper.toResponse(repository.save(doctor));
+    }
+
+    private void updateDoctorFields(Doctor doctor, DoctorRequest request, List<Category> categories) {
+        doctor.setName(request.name());
+        doctor.setCrm(request.crm());
+        doctor.setCrmUf(request.crmUf());
+        doctor.setEmail(request.email());
+        doctor.setPhone(request.phone());
+        doctor.setBirthDate(request.birthDate());
+        doctor.setCategories(new HashSet<>(categories));
     }
 
 }

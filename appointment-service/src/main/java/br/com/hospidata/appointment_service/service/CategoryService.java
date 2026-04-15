@@ -5,6 +5,7 @@ import br.com.hospidata.appointment_service.controller.dto.CategoryResponse;
 import br.com.hospidata.appointment_service.entity.Category;
 import br.com.hospidata.appointment_service.mapper.CategoryMapper;
 import br.com.hospidata.appointment_service.repository.CategoryRepository;
+import br.com.hospidata.common.exceptions.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import br.com.hospidata.common.exceptions.ResourceNotFoundException;
@@ -71,6 +72,37 @@ public class CategoryService {
 
         return mapper.toResponse(repository.save(category));
 
+    }
+
+    @Transactional
+    public List<Category> findCategoriesByIds(List<String> categoryIdsRequest) {
+
+        List<UUID> categoryIds;
+
+        try {
+            categoryIds = categoryIdsRequest
+                    .stream()
+                    .map(UUID::fromString)
+                    .toList();
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException(
+                    "Category",
+                    "categoryIds",
+                    "one or more UUIDs are invalid"
+            );
+        }
+
+        List<Category> categories = repository.findAllById(categoryIds);
+
+        if (categories.size() != categoryIds.size()) {
+            throw new ResourceNotFoundException(
+                    "Category",
+                    "id",
+                    categoryIds.toString()
+            );
+        }
+
+        return categories;
     }
 
 }
