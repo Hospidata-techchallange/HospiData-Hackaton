@@ -2,6 +2,7 @@ package br.com.hospidata.appointment_service.mapper;
 
 import br.com.hospidata.appointment_service.controller.dto.DoctorRequest;
 import br.com.hospidata.appointment_service.controller.dto.DoctorResponse;
+import br.com.hospidata.appointment_service.controller.dto.DoctorSimpleResponse;
 import br.com.hospidata.appointment_service.entity.Category;
 import br.com.hospidata.appointment_service.entity.Doctor;
 import org.springframework.stereotype.Component;
@@ -59,10 +60,13 @@ public class DoctorMapper {
     }
 
 
+    public DoctorSimpleResponse toSimpleResponse(Doctor doctor) {
 
+        return new DoctorSimpleResponse(
+                doctor.getId(),
+                doctor.getName(),
+                categoryMapper.toSimpleResponses(doctor.getCategories())
+        );
 
-
-
-
-
+    }
 }

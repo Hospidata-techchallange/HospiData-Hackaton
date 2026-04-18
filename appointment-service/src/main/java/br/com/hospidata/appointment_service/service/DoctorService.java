@@ -57,6 +57,12 @@ public class DoctorService {
                 .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString())));
     }
 
+    @Transactional(readOnly = true)
+    public Doctor findDoctorEntityById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", id.toString()));
+    }
+
     @Transactional
     public void deleteDoctor(UUID id) {
         Doctor find = repository.findById(id)
