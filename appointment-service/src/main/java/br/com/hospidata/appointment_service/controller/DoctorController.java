@@ -4,6 +4,8 @@ package br.com.hospidata.appointment_service.controller;
 import br.com.hospidata.appointment_service.controller.dto.DoctorRequest;
 import br.com.hospidata.appointment_service.controller.dto.DoctorResponse;
 import br.com.hospidata.appointment_service.service.DoctorService;
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,7 @@ public class DoctorController {
     }
 
     @PostMapping
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<DoctorResponse> createDoctor(
             @RequestBody DoctorRequest request
     ) {
@@ -29,6 +32,7 @@ public class DoctorController {
     }
 
     @GetMapping
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<List<DoctorResponse>> getAllDoctor(
             @RequestParam(required = false) Boolean active
     ) {
@@ -36,23 +40,27 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(service.findDoctorById(id));
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> deleteDoctorById(@PathVariable UUID id) {
         service.deleteDoctor(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/enable/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> enableDoctor(@PathVariable UUID id) {
         service.enableDoctor(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<DoctorResponse> updateDoctorById(@PathVariable UUID id, @RequestBody DoctorRequest request){
         return ResponseEntity.status(HttpStatus.OK).body(service.updateDoctor(id, request));
     }

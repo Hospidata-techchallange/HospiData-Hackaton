@@ -4,6 +4,8 @@ import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleRequest
 import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleResponse;
 import br.com.hospidata.appointment_service.entity.DoctorSchedule;
 import br.com.hospidata.appointment_service.service.DoctorScheduleService;
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import jakarta.ws.rs.PUT;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -24,11 +26,13 @@ public class DoctorScheduleController {
     }
 
     @PostMapping
+    @CheckRole({Role.ADMIN , Role.DOCTOR})
     public ResponseEntity<DoctorScheduleResponse> createDoctorSchedule(@RequestBody DoctorScheduleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createDoctorSchedule(request));
     }
 
     @GetMapping
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<List<DoctorScheduleResponse>> findAllDoctorSchedule(
             @RequestParam(required = false) Boolean active
             ) {
@@ -36,23 +40,27 @@ public class DoctorScheduleController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<DoctorScheduleResponse> getDoctorScheduleById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(service.findDoctorScheduleById(id));
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> deleteDoctorScheduleById(@PathVariable UUID id) {
         service.deleteDoctor(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/enable/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> enableDoctorSchedule(@PathVariable UUID id) {
         service.enableDoctorSchedule(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<DoctorScheduleResponse> updateDoctorScheduleById(@PathVariable UUID id, @RequestBody DoctorScheduleRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(service.updateDoctorSchedule(id, request));
     }

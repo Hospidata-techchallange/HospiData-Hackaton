@@ -1,6 +1,8 @@
 package br.com.hospidata.appointment_service.controller;
 
 import br.com.hospidata.appointment_service.controller.dto.RequestStatus;
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import br.com.hospidata.appointment_service.controller.dto.AppointmentRequest;
@@ -23,6 +25,7 @@ public class AppointmentController {
     }
 
     @PostMapping
+    @CheckRole({Role.ADMIN , Role.AGENT})
     public ResponseEntity<AppointmentResponse> createAppointment(
             @RequestBody AppointmentRequest request
     ) {
@@ -30,6 +33,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<AppointmentResponse> getAppointmentById(
             @PathVariable UUID id
     ) {
@@ -37,6 +41,7 @@ public class AppointmentController {
     }
 
     @GetMapping("/filter")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<Page<AppointmentResponse>> filterAppointment(
             @RequestParam(required = false) String search,
             Pageable pageable
@@ -47,6 +52,7 @@ public class AppointmentController {
     }
 
     @PatchMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> updateStatus (
             @PathVariable UUID id ,
             @RequestBody RequestStatus status
@@ -56,6 +62,7 @@ public class AppointmentController {
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> deleteAppointmentById(
             @PathVariable UUID id
     ) {
@@ -64,6 +71,7 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<AppointmentResponse> updateAppointmentById (
             @PathVariable UUID id,
             @RequestBody AppointmentRequest request

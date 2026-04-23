@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication(
 		scanBasePackages = {
 				"br.com.hospidata.appointment_service",
-				"br.com.hospidata.common"
+				"br.com.hospidata.common",
+				"br.com.hospidata.common_security"
 		}
 )
 public class AppointmentServiceApplication {

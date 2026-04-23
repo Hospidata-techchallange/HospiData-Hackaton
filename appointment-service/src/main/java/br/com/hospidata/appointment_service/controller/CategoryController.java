@@ -3,6 +3,8 @@ package br.com.hospidata.appointment_service.controller;
 import br.com.hospidata.appointment_service.controller.dto.CategoryRequest;
 import br.com.hospidata.appointment_service.controller.dto.CategoryResponse;
 import br.com.hospidata.appointment_service.service.CategoryService;
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<List<CategoryResponse>> getAllCategories(
             @RequestParam(required = false) Boolean active
     ) {
@@ -28,11 +31,13 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable UUID id) {
         return  ResponseEntity.ok().body(service.findCategoryById(id));
     }
 
     @PostMapping
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<CategoryResponse> createCategory(
             @RequestBody CategoryRequest request
     ){
@@ -40,6 +45,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> deleteCategory(
             @PathVariable UUID id
     ) {
@@ -48,6 +54,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/enable/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<Void> enableCategory(
             @PathVariable UUID id
     ) {
@@ -56,6 +63,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @CheckRole({Role.ADMIN})
     public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable UUID id ,
             @RequestBody CategoryRequest request
