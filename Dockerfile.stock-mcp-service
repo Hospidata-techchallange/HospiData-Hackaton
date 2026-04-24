@@ -12,6 +12,7 @@ RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
     sed -i 's|<module>auth-service</module>||g' pom.xml && \
     sed -i 's|<module>work-order-service</module>||g' pom.xml && \
     sed -i 's|<module>stock-service</module>||g' pom.xml && \
+    sed -i 's|<module>appointment-mcp-service</module>||g' pom.xml && \
     sed -i 's|<module>appointment-service</module>||g' pom.xml && \
     sed -i 's|<module>config-service</module>||g' pom.xml
 

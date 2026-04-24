@@ -36,4 +36,4 @@ mybatis:
     map-underscore-to-camel-case: true
 
 server :
-  port : 8085
+  port : 8086
