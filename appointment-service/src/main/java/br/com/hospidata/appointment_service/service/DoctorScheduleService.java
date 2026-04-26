@@ -1,5 +1,6 @@
 package br.com.hospidata.appointment_service.service;
 
+import br.com.hospidata.appointment_service.common.CustomRsqlVisitor;
 import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleRequest;
 import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleResponse;
 import br.com.hospidata.appointment_service.entity.Doctor;
@@ -7,6 +8,10 @@ import br.com.hospidata.appointment_service.entity.DoctorSchedule;
 import br.com.hospidata.appointment_service.mapper.DoctorScheduleMapper;
 import br.com.hospidata.appointment_service.repository.DoctorScheduleRepository;
 import br.com.hospidata.common.exceptions.ResourceNotFoundException;
+import cz.jirutka.rsql.parser.RSQLParser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,5 +89,21 @@ public class DoctorScheduleService {
         doctorSchedule.setStartTime(request.startTime());
         doctorSchedule.setEndTime(request.endTime());
         doctorSchedule.setSlotDurationMinutes(request.slotDurationMinutes());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DoctorScheduleResponse> filterDoctorSchedule(String search, Pageable pageable) {
+        Specification<DoctorSchedule> spec = null;
+
+        if (search != null && !search.isBlank()) {
+            spec = new RSQLParser()
+                    .parse(search)
+                    .accept(new CustomRsqlVisitor<>());
+        }
+
+        return repository
+                .findAll(spec, pageable)
+                .map(mapper::toResponse);
+
     }
 }

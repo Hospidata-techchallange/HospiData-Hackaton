@@ -6,6 +6,8 @@ import br.com.hospidata.appointment_service.controller.dto.DoctorResponse;
 import br.com.hospidata.appointment_service.service.DoctorService;
 import br.com.hospidata.common_security.aspect.CheckRole;
 import br.com.hospidata.common_security.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +45,16 @@ public class DoctorController {
     @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(service.findDoctorById(id));
+    }
+
+    @GetMapping("/filter")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<Page<DoctorResponse>> filterDoctor(
+            @RequestParam(required = false) String search ,
+            Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(service.filterDoctors(search , pageable));
     }
 
     @DeleteMapping("/{id}")

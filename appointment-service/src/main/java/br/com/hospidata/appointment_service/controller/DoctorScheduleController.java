@@ -2,13 +2,12 @@ package br.com.hospidata.appointment_service.controller;
 
 import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleRequest;
 import br.com.hospidata.appointment_service.controller.dto.DoctorScheduleResponse;
-import br.com.hospidata.appointment_service.entity.DoctorSchedule;
 import br.com.hospidata.appointment_service.service.DoctorScheduleService;
 import br.com.hospidata.common_security.aspect.CheckRole;
 import br.com.hospidata.common_security.enums.Role;
-import jakarta.ws.rs.PUT;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +42,16 @@ public class DoctorScheduleController {
     @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
     public ResponseEntity<DoctorScheduleResponse> getDoctorScheduleById(@PathVariable UUID id) {
         return ResponseEntity.ok().body(service.findDoctorScheduleById(id));
+    }
+
+    @GetMapping("/filter")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<Page<DoctorScheduleResponse>> filterDoctorSchedule(
+        @RequestParam(required = false) String search,
+        Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(service.filterDoctorSchedule(search , pageable));
     }
 
     @DeleteMapping("/{id}")

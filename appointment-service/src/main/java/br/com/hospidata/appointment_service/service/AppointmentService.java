@@ -94,7 +94,7 @@ public class AppointmentService {
         }
     }
 
-
+    @Transactional(readOnly = true)
     public Page<AppointmentResponse> filterAppointment(String search, Pageable pageable) {
         Specification<Appointment> spec = null;
 
