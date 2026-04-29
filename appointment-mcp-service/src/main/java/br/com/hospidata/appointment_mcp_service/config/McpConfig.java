@@ -1,6 +1,7 @@
 package br.com.hospidata.appointment_mcp_service.config;
 
 import br.com.hospidata.appointment_mcp_service.tool.CategoryTool;
+import br.com.hospidata.appointment_mcp_service.tool.DoctorScheduleTool;
 import br.com.hospidata.appointment_mcp_service.tool.DoctorTool;
 import br.com.hospidata.appointment_mcp_service.tool.TestTool;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -14,10 +15,11 @@ public class McpConfig {
     public ToolCallbackProvider toolCallbackProvider(
             TestTool testTool ,
             CategoryTool categoryTool ,
-            DoctorTool doctorTool
+            DoctorTool doctorTool,
+            DoctorScheduleTool doctorScheduleTool
     ) {
         return MethodToolCallbackProvider.builder()
-                .toolObjects(testTool , categoryTool , doctorTool)
+                .toolObjects(testTool , categoryTool , doctorTool , doctorScheduleTool)
                 .build();
     }
 

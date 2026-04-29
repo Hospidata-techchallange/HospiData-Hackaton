@@ -1,11 +1,13 @@
 package br.com.hospidata.appointment_mcp_service.service;
 
 import br.com.hospidata.appointment_mcp_service.client.DoctorClient;
+import br.com.hospidata.appointment_mcp_service.dto.PageResponse;
 import br.com.hospidata.appointment_mcp_service.dto.doctor.DoctorClientResponse;
 import br.com.hospidata.appointment_mcp_service.mapper.DoctorMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DoctorService {
@@ -20,6 +22,11 @@ public class DoctorService {
 
     public List<DoctorClientResponse> getAllDoctors() {
         return client.getAllDoctors();
+    }
+
+    public PageResponse<DoctorClientResponse> getAllDoctorsByCategoryId(String categoryId) {
+        String search = "categories.id==" + categoryId;
+        return client.getAllDoctorsByCategoryId(search);
     }
 
 }
