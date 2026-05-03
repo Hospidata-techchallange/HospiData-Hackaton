@@ -30,4 +30,8 @@ public class DateUtilsService {
 
         return dates;
     }
+
+    public LocalDate getCurrentDate() {
+        return LocalDate.now();
+    }
 }

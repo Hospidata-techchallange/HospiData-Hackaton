@@ -12,14 +12,49 @@ if sys.platform == "win32":
 
 load_dotenv()
 
-st.markdown("<h1 style='text-align: center;'>Hospidata Stock Assistant</h1>", unsafe_allow_html=True)
+AGENT_OPTIONS = {
+    "stock": {
+        "label": "Estoque",
+        "title": "Hospidata Stock Assistant",
+        "placeholder": "Pergunte algo sobre o estoque...",
+        "spinner": "Consultando estoque..."
+    },
+    "appointment": {
+        "label": "Agendamentos",
+        "title": "Hospidata Appointment Assistant",
+        "placeholder": "Pergunte algo sobre médicos, agendas ou consultas...",
+        "spinner": "Consultando agendamentos..."
+    }
+}
 
 # -------------------------
-# HISTÓRICO
+# AGENTS
 # -------------------------
 
-if "history" not in st.session_state:
-    st.session_state.history = []
+if "agents" not in st.session_state:
+    st.session_state.agents = AgentsFactory.create_agents()
+
+if "current_agent_key" not in st.session_state:
+    st.session_state.current_agent_key = "stock"
+
+if "histories" not in st.session_state:
+    st.session_state.histories = {agent_key: [] for agent_key in AGENT_OPTIONS}
+
+selected_agent_key = st.selectbox(
+    "Agent",
+    options=list(AGENT_OPTIONS.keys()),
+    index=list(AGENT_OPTIONS.keys()).index(st.session_state.current_agent_key),
+    format_func=lambda agent_key: AGENT_OPTIONS[agent_key]["label"]
+)
+
+st.session_state.current_agent_key = selected_agent_key
+st.session_state.current_agent = st.session_state.agents[selected_agent_key]
+st.session_state.history = st.session_state.histories[selected_agent_key]
+
+st.markdown(
+    f"<h1 style='text-align: center;'>{AGENT_OPTIONS[selected_agent_key]['title']}</h1>",
+    unsafe_allow_html=True
+)
 
 # -------------------------
 # RENDER HISTÓRICO
@@ -27,50 +62,36 @@ if "history" not in st.session_state:
 
 for message in st.session_state.history:
 
-    type = message.get("role", None) or message.get("type", None)
+    message_type = message.get("role", None) or message.get("type", None)
 
-    match type:
+    if message_type == "user":
+        with st.chat_message("user"):
+            st.markdown(message["content"])
 
-        case "user":
-            with st.chat_message("user"):
-                st.markdown(message["content"])
+    elif message_type == "assistant":
+        with st.chat_message("assistant"):
+            st.markdown(message["content"][0]["text"])
 
-        case "assistant":
-            with st.chat_message("assistant"):
-                st.markdown(message["content"][0]["text"])
+    elif message_type == "function_call":
 
-        case "function_call":
+        if "transfer_to" not in message["name"]:
+            with st.chat_message(name="tool", avatar=":material/build:"):
+                st.markdown(f'LLM chamando tool **{message["name"]}**')
 
-            if "transfer_to" not in message["name"]:
-                with st.chat_message(name="tool", avatar=":material/build:"):
-                    st.markdown(f'LLM chamando tool **{message["name"]}**')
+                with st.expander("Visualizar argumentos"):
+                    st.code(message["arguments"])
 
-                    with st.expander("Visualizar argumentos"):
-                        st.code(message["arguments"])
+    elif message_type == "function_call_output":
 
-        case "function_call_output":
+        try:
+            obj = json.loads(message["output"])
 
-            try:
-                obj = json.loads(message["output"])
+            with st.chat_message(name="tool", avatar=":material/data_object:"):
+                with st.expander("Resposta da tool"):
+                    st.code(obj)
 
-                with st.chat_message(name="tool", avatar=":material/data_object:"):
-                    with st.expander("Resposta da tool"):
-                        st.code(obj)
-
-            except:
-                continue
-
-
-# -------------------------
-# AGENTS
-# -------------------------
-
-if "agentStock" not in st.session_state:
-
-    agents = AgentsFactory.create_agents()
-
-    st.session_state.agentStock = agents["stock"]
-    st.session_state.current_agent = agents["stock"]
+        except json.JSONDecodeError:
+            continue
 
 
 # -------------------------
@@ -79,25 +100,30 @@ if "agentStock" not in st.session_state:
 
 async def resolve_chat():
 
-    async with MCPManager.get_server() as server:
+    agent_key = st.session_state.current_agent_key
+    current_agent = st.session_state.agents[agent_key]
 
-        st.session_state.agentStock.mcp_servers = [server]
+    async with MCPManager.get_server(agent_key) as server:
+
+        current_agent.mcp_servers = [server]
 
         result = await Runner.run(
-            starting_agent=st.session_state.current_agent,
+            starting_agent=current_agent,
             input=st.session_state.history,
             context=st.session_state.history
         )
 
+        st.session_state.agents[agent_key] = result.last_agent
         st.session_state.current_agent = result.last_agent
-        st.session_state.history = result.to_input_list()
+        st.session_state.histories[agent_key] = result.to_input_list()
+        st.session_state.history = st.session_state.histories[agent_key]
 
 
 # -------------------------
 # INPUT
 # -------------------------
 
-prompt = st.chat_input("Pergunte algo sobre o estoque...")
+prompt = st.chat_input(AGENT_OPTIONS[selected_agent_key]["placeholder"])
 
 if prompt:
 
@@ -109,7 +135,7 @@ if prompt:
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    with st.spinner("Consultando estoque..."):
+    with st.spinner(AGENT_OPTIONS[selected_agent_key]["spinner"]):
 
         asyncio.run(resolve_chat())
         st.rerun()

@@ -5,6 +5,7 @@ import br.com.hospidata.appointment_mcp_service.service.DateUtilsService;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -40,4 +41,37 @@ O retorno contém:
     public List<AvailableDateResponse> getDatesByDayOfWeek(String dayOfWeek) {
         return service.getDatesByDayOfWeek(dayOfWeek);
     }
+
+    @Tool(
+            name = "getCurrentDate",
+            description = """
+            Retorna a data atual oficial do sistema.
+
+            Use esta ferramenta sempre que o usuário mencionar datas relativas, como:
+            - hoje
+            - amanhã
+            - depois de amanhã
+            - semana que vem
+            - mês que vem
+            - próxima segunda-feira
+            - próxima terça-feira
+            - qualquer dia da semana sem informar uma data exata
+
+            Regras:
+            - Nunca use conhecimento interno do modelo para descobrir a data atual.
+            - Sempre chame esta ferramenta antes de calcular datas relativas.
+            - A data retornada deve ser usada como referência oficial para agendamentos.
+            - Nunca crie agendamentos em datas anteriores à data retornada.
+
+            O retorno contém:
+            - currentDate: data atual no formato yyyy-MM-dd
+            - timezone: timezone usado no cálculo
+            """
+    )
+    public LocalDate getCurrentDate() {
+        return service.getCurrentDate();
+    }
+
+
+
 }
