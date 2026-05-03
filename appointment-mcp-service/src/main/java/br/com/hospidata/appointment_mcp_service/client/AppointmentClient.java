@@ -5,6 +5,7 @@ import br.com.hospidata.appointment_mcp_service.config.FeignAuthConfig;
 import br.com.hospidata.appointment_mcp_service.dto.PageResponse;
 import br.com.hospidata.appointment_mcp_service.dto.appointment.AppointmentClientResponse;
 import br.com.hospidata.appointment_mcp_service.dto.appointment.AppointmentRequest;
+import br.com.hospidata.appointment_mcp_service.dto.appointment.DoctorAvailableSlotsResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,12 @@ public interface AppointmentClient {
     @GetMapping("/api/v1/appointment/filter")
     PageResponse<AppointmentClientResponse> getAppointmentsByAppointmentDateAndDoctorId(
             @RequestParam("search") String search
+    );
+
+    @GetMapping("/api/v1/appointment/available-slots")
+    DoctorAvailableSlotsResponse getAvailableSlotsByDoctorAndDate(
+            @RequestParam("doctorId") String doctorId,
+            @RequestParam("appointmentDate") String appointmentDate
     );
 
     @PostMapping("/api/v1/appointment")

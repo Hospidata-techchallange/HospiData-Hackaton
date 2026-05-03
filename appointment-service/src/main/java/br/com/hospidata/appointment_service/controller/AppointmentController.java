@@ -1,6 +1,8 @@
 package br.com.hospidata.appointment_service.controller;
 
+import br.com.hospidata.appointment_service.controller.dto.DoctorAvailableSlotsResponse;
 import br.com.hospidata.appointment_service.controller.dto.RequestStatus;
+import br.com.hospidata.appointment_service.service.DoctorAvailabilityService;
 import br.com.hospidata.common_security.aspect.CheckRole;
 import br.com.hospidata.common_security.enums.Role;
 import org.springframework.data.domain.Page;
@@ -19,9 +21,11 @@ import java.util.UUID;
 public class AppointmentController {
 
     private final AppointmentService service;
+    private final DoctorAvailabilityService doctorAvailabilityService;
 
-    public AppointmentController(AppointmentService service) {
+    public AppointmentController(AppointmentService service, DoctorAvailabilityService doctorAvailabilityService) {
         this.service = service;
+        this.doctorAvailabilityService = doctorAvailabilityService;
     }
 
     @PostMapping
@@ -49,6 +53,17 @@ public class AppointmentController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(service.filterAppointment(search , pageable));
+    }
+
+    @GetMapping("/available-slots")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<DoctorAvailableSlotsResponse> getAvailableSlotsByDoctorAndDate(
+            @RequestParam String doctorId,
+            @RequestParam String appointmentDate
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(doctorAvailabilityService.getAvailableSlotsByDoctorAndDate(doctorId, appointmentDate));
     }
 
     @PatchMapping("/{id}")
