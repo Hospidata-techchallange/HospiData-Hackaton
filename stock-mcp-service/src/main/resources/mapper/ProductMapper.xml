@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="br.com.hospidata.stock_mcp_service.mapper.ProductMapper">
+
+    <select id="findAllProducts" resultType="br.com.hospidata.stock_mcp_service.dto.ProductDto">
+        SELECT
+        tp.id_product        AS idProduct,
+        tp.name              AS name,
+        tp.description       AS description,
+        tp.sku_code          AS skuCode,
+        tp.min_stock_alert   AS minStockAlert,
+        tp.category_id       AS categoryId,
+        tc.name              AS categoryName,
+        tp.active            AS active
+        FROM stock_schema.tb_product tp
+        INNER JOIN stock_schema.tb_category tc
+        ON tc.id_category = tp.category_id
+
+        <where>
+            <if test="name != null and name != ''">
+                AND tp.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+
+            <if test="skuCode != null and skuCode != ''">
+                AND tp.sku_code = #{skuCode}
+            </if>
+
+            <if test="categoryId != null">
+                AND tp.category_id = #{categoryId}
+            </if>
+
+            <if test="active != null">
+                AND tp.active = #{active}
+            </if>
+        </where>
+    </select>
+
+</mapper>

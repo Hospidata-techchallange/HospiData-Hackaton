@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="br.com.hospidata.stock_mcp_service.mapper.BatchMapper">
+
+    <select id="findAllBatches" resultType="br.com.hospidata.stock_mcp_service.dto.BatchDto">
+        SELECT
+        tb.id_batch            AS idBatch,
+        tb.batch_number        AS batchNumber,
+        tb.quantity_available  AS quantityAvailable,
+        tb.initial_quantity    AS initialQuantity,
+        tb.manufacturing_date  AS manufacturingDate,
+        tb.expiration_date     AS expirationDate,
+        tb.product_id          AS productId,
+        tp.name                AS productName,
+        tb.location_id         AS locationId,
+        tl.aisle,
+        tl.bin,
+        tl.shelf,
+        tl.description,
+        tb.unit_price          AS unitPrice,
+        tb.active
+        FROM
+        stock_schema.tb_batch tb
+        INNER JOIN
+        stock_schema.tb_product tp
+        ON tp.id_product = tb.product_id
+        INNER JOIN
+        stock_schema.tb_location tl
+        ON tl.id_location = tb.location_id
+
+        <where>
+
+            <if test="productIds != null and productIds.size() > 0">
+                AND tb.product_id IN
+                <foreach item="id" collection="productIds" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+
+            <if test="batchNumber != null">
+                AND tb.batch_number = #{batchNumber}
+            </if>
+
+            <if test="aisle != null">
+                AND tl.aisle = #{aisle}
+            </if>
+
+            <if test="active != null">
+                AND tb.active = #{active}
+            </if>
+
+            <if test="nearExpirationDays != null">
+                AND tb.expiration_date &lt;= DATE_ADD(CURDATE(), INTERVAL #{nearExpirationDays} DAY)
+            </if>
+
+            <if test="expired != null and expired == true">
+                AND tb.expiration_date &lt; CURDATE()
+            </if>
+
+        </where>
+
+        ORDER BY tb.expiration_date ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+spring :
+  datasource:
+    url: jdbc:mariadb://hospidata-db:3306/stock_schema
+    username: stock-agent
+    password: password
+    driver-class-name: org.mariadb.jdbc.Driver
+
+    hikari:
+      pool-name: HikariCP
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 600000
+
+  ai:
+    mcp:
+      server:
+        endpoint: /mcp
+        protocol: streamable
+        stdio: false
+
+auth :
+  client : 
+    email : agent@email.com
+    password : password
+
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: br.com.hospidata.stock_mcp_service.dto
+  configuration:
+    map-underscore-to-camel-case: true
+
+server :
+  port : 8086

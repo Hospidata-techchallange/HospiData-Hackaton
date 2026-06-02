@@ -21,6 +21,9 @@
         <module>auth-service</module>
         <module>stock-service</module>
         <module>work-order-service</module>
+        <module>stock-mcp-service</module>
+        <module>appointment-mcp-service</module>
+        <module>appointment-service</module>
         <module>common</module>
         <module>common-security</module>
     </modules>

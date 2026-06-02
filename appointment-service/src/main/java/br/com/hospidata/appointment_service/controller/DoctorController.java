@@ -1,0 +1,81 @@
+package br.com.hospidata.appointment_service.controller;
+
+
+import br.com.hospidata.appointment_service.controller.dto.DoctorRequest;
+import br.com.hospidata.appointment_service.controller.dto.DoctorResponse;
+import br.com.hospidata.appointment_service.service.DoctorService;
+import br.com.hospidata.common_security.aspect.CheckRole;
+import br.com.hospidata.common_security.enums.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/appointment/doctor")
+public class DoctorController {
+
+    private final DoctorService service;
+
+    public DoctorController(DoctorService service) {
+        this.service = service;
+    }
+
+    @PostMapping
+    @CheckRole({Role.ADMIN})
+    public ResponseEntity<DoctorResponse> createDoctor(
+            @RequestBody DoctorRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createDoctor(request));
+    }
+
+    @GetMapping
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<List<DoctorResponse>> getAllDoctor(
+            @RequestParam(required = false) Boolean active
+    ) {
+        return ResponseEntity.ok().body(service.findAllDoctors(active));
+    }
+
+    @GetMapping("/{id}")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<DoctorResponse> getDoctorById(@PathVariable UUID id) {
+        return ResponseEntity.ok().body(service.findDoctorById(id));
+    }
+
+    @GetMapping("/filter")
+    @CheckRole({Role.ADMIN , Role.AGENT , Role.DOCTOR})
+    public ResponseEntity<Page<DoctorResponse>> filterDoctor(
+            @RequestParam(required = false) String search ,
+            Pageable pageable
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(service.filterDoctors(search , pageable));
+    }
+
+    @DeleteMapping("/{id}")
+    @CheckRole({Role.ADMIN})
+    public ResponseEntity<Void> deleteDoctorById(@PathVariable UUID id) {
+        service.deleteDoctor(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/enable/{id}")
+    @CheckRole({Role.ADMIN})
+    public ResponseEntity<Void> enableDoctor(@PathVariable UUID id) {
+        service.enableDoctor(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{id}")
+    @CheckRole({Role.ADMIN})
+    public ResponseEntity<DoctorResponse> updateDoctorById(@PathVariable UUID id, @RequestBody DoctorRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(service.updateDoctor(id, request));
+    }
+
+
+}

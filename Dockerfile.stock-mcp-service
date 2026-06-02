@@ -1,0 +1,27 @@
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
+WORKDIR /app
+
+COPY pom.xml .
+COPY common common
+COPY common-security common-security
+
+COPY stock-mcp-service stock-mcp-service
+
+RUN sed -i 's|<module>discovery-service</module>||g' pom.xml && \
+    sed -i 's|<module>gateway-service</module>||g' pom.xml && \
+    sed -i 's|<module>auth-service</module>||g' pom.xml && \
+    sed -i 's|<module>work-order-service</module>||g' pom.xml && \
+    sed -i 's|<module>stock-service</module>||g' pom.xml && \
+    sed -i 's|<module>appointment-mcp-service</module>||g' pom.xml && \
+    sed -i 's|<module>appointment-service</module>||g' pom.xml && \
+    sed -i 's|<module>config-service</module>||g' pom.xml
+
+RUN mvn clean package -DskipTests -pl stock-mcp-service -am
+
+FROM eclipse-temurin:21-jre-alpine
+
+RUN apk add --no-cache curl
+
+WORKDIR /app
+COPY --from=build /app/stock-mcp-service/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]

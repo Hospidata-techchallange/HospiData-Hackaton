@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="br.com.hospidata.stock_mcp_service.mapper.CategoryMapper">
+
+    <select id="findAllCategories" resultType="br.com.hospidata.stock_mcp_service.dto.CategoryDto">
+        SELECT
+        tc.id_category,
+        tc.name,
+        tc.description,
+        tc.active
+        FROM stock_schema.tb_category tc
+        WHERE 1=1
+        <if test="active != null">
+            AND tc.active = #{active}
+        </if>
+    </select>
+
+</mapper>

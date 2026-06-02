@@ -20,6 +20,10 @@ spring:
               uri: lb://WORK-ORDER-SERVICE
               predicates:
                 - Path=/api/v1/work-order,/api/v1/work-order/**
+            - id : APPOINTMENT-SERVICE
+              uri: lb://APPOINTMENT-SERVICE
+              predicates:
+                  - Path=/api/v1/appointment,/api/v1/appointment/**
 
 server:
   port: 8080
